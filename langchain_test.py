@@ -1,7 +1,16 @@
 from langchain_community.chat_models import ChatPerplexity
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import dotenv_values
+import langchain
+import os
 
+# The location of my CA File
+cert_file = "/usr/local/share/ca-certificates/mitmproxy.crt"
+os.environ["REQUESTS_CA_BUNDLE"] = cert_file
+os.environ["SSL_CERT_FILE"] = cert_file
+os.environ["HTTPS_PROXY"] = "http://127.0.0.1:8080"
+
+langchain.debug = True
 config = dotenv_values(".env")
 
 PERPLEXITY_API_KEY = config["PERPLEXITY_API_KEY"]
@@ -44,7 +53,8 @@ Order: {
 
 
 template = """You are an assistant helping customers with their orders. 
-You do not have ability to process or change the state of orders, you should just explain the status of the order based on the JSON representation of the order.
+You do not have ability to process or change the state of orders, you should just explain the status of the order based on our system information of the order.
+The user is not assumed to be technical so please explain in a simple and clear way.
 
 Customer: Hi, I placed an order last week and I haven't received it yet. Can you help me with that?
 
@@ -61,26 +71,11 @@ model = ChatPerplexity(
     pplx_api_key=PERPLEXITY_API_KEY,
     model="llama-3.1-sonar-small-128k-online",
     temperature=0.1,
-    max_tokens=200,
+    max_tokens=75,
 )
 
 chain = prompt | model
 
 response = chain.invoke({"order_details": order_details})
 
-print(response)
-
-
-Based on the provided JSON representation of the order, the current status of your order is "shipped." 
-This means that the shipping label has been generated, and the order has been handed over to the shipping company. 
-The estimated delivery date is September 19, 2022, and the order was placed on September 10, 2022.
-
-Here are the key details from the order JSON:
-
-- **Order Status**: Shipped
-- **Order Date**: September 10, 2022
-- **Estimated Delivery Date**: September 19, 2022
-- **Shipping Address**: 1265 Military Trail, Toronto, ON M1C1A4, Canada
-
-If you haven\'t received your order yet, it might be due to delays in the shipping process. 
-You can track the order using the tracking number provided by the shipping company to get more detailed updates on its status
+print(response.content)

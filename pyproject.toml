@@ -1,0 +1,15 @@
+[project]
+name = "cscd01-perplexity-issue"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "langchain-core==0.3.21",
+    "langchain==0.3.8",
+    "langchain-community==0.3.8",
+    "langchain-text-splitters==0.3.2",
+    "python-dotenv==1.0.1",
+    "requests==2.32.3",
+    "openai==1.55.1",
+]
